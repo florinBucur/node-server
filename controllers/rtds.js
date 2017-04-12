@@ -1,17 +1,25 @@
 var express = require('express')
   , router = express.Router()
   , Rtd = require('../models/rtd')
-  , queries = require('../helpers/queries')
+
 
 router.get('/rtd', function(req, res) {
   Rtd.retrieveByMac(req.query.mac, function (err, body) {
-    res.send(body.rows);
+    var result = [];
+    for(var i in body.rows){
+      result.push(body.rows[i].value);
+    }
+    res.send(result);
   })
 })
 
 router.get('/', function(req, res){
   Rtd.retrieveAll(function(err, body){
-    res.send(body.rows);
+    var result = [];
+    for(var i in body.rows){
+      result.push(body.rows[i].value);
+    }
+    res.send(result);
   })
 })
 
@@ -25,9 +33,15 @@ router.post('/', function(req, res) {
   })
 })
 
-router.get('/test', function(req, res){
-  var result = queries.selectorByDevices(["b19", "b6", "b11"]);
-  res.send(result);
+router.post('/test', function(req, res){
+  Rtd.getByDevices(req.body.devices, function(err, body){
+    if(!err){
+      res.send(body);
+    }else{
+      res.send(err);
+    }
+  })
+  
 })
 
 module.exports = router
